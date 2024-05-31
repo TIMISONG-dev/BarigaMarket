@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:marketplace/classes/account.dart';
 import 'package:marketplace/classes/bucket.dart';
@@ -26,16 +27,72 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
   static int indph = 0;
   static int ind = 0;
 
   @override
-  Widget build(BuildContext context) {
-    final ValueNotifier<String> search = ValueNotifier('');
+  _HomeState createState() => _HomeState();
+}
 
+class _HomeState extends State<Home> {
+
+  final ValueNotifier<String> search = ValueNotifier('');
+  final Map<int, ValueNotifier<bool>> favIconMap = {};
+  final Map<int, ValueNotifier<bool>> cartIconMap = {};
+
+  @override
+  void dispose() {
+    search.dispose();
+    favIconMap.values.forEach((notifier) => notifier.dispose());
+    cartIconMap.values.forEach((notifier) => notifier.dispose());
+    super.dispose();
+  }
+
+  void changeFavIcon(int index) {
+    if (!favIconMap.containsKey(index)) {
+      favIconMap[index] = ValueNotifier<bool>(true);
+    }
+    final isFav = !favIconMap[index]!.value;
+    favIconMap[index]!.value = isFav;
+
+    if (isFav) {
+      Favourite.addItem(
+        products[index].id,
+        index,
+        products[index].name,
+        products[index].cost,
+        products[index].photo,
+      );
+    } else {
+      Favourite.fav.removeAt(index);
+    }
+  }
+
+  void changeCartIcon(int index) {
+    if (!cartIconMap.containsKey(index)) {
+      cartIconMap[index] = ValueNotifier<bool>(true);
+    }
+    final isInCart = !cartIconMap[index]!.value;
+    cartIconMap[index]!.value = isInCart;
+
+    if (isInCart) {
+      Bucket.addItem(
+        products[index].id,
+        index,
+        products[index].name,
+        products[index].cost,
+        products[index].photo,
+      );
+    } else {
+      Bucket.cart.removeAt(index);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -139,8 +196,8 @@ class Home extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        indph = index * 3;
-                        ind = index;
+                        Home.indph = index * 3;
+                        Home.ind = index;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -149,7 +206,7 @@ class Home extends StatelessWidget {
                       },
                       child: Container(
                         width: 200,
-                        height: 300,
+                        height: 320,
                         margin: const EdgeInsets.all(10),
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -165,6 +222,33 @@ class Home extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: favIconMap.putIfAbsent(index, () => ValueNotifier<bool>(Favourite.isFavourite(products[index].id))),
+                                  builder: (context, isFav, child) {
+                                    return IconButton(
+                                      icon: Icon(isFav
+                                          ? Icons.favorite
+                                          : Icons.favorite_border),
+                                      onPressed: () => changeFavIcon(index),
+                                    );
+                                  },
+                                ),
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: cartIconMap.putIfAbsent(index, () => ValueNotifier<bool>(Bucket.isInBucket(products[index].id))),
+                                  builder: (context, isInCart, child) {
+                                    return IconButton(
+                                      icon: Icon(isInCart
+                                          ? Icons.shopping_cart
+                                          : Icons.shopping_cart_outlined),
+                                      onPressed: () => changeCartIcon(index),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                             Image.network(
                               filteredProducts[index].photo,
                               width: 100,

@@ -32,6 +32,10 @@ class Favourite extends StatefulWidget {
     fav.add(FavStrings(id, oldid, name, cost, photo));
   }
 
+  static bool isFavourite(int id) {
+    return fav.contains(id);
+  }
+
   @override
   _FavouriteState createState() => _FavouriteState();
 }
@@ -105,6 +109,11 @@ class _FavouriteState extends State<Favourite> {
                                 fontWeight: FontWeight.bold)
                         ),
                       ),
+                      IconButton(onPressed: (){ setState(() {
+                        Favourite.fav.removeAt(index);
+                      });},
+                          icon: const Icon(Icons.delete)
+                      )
                     ],
                   ),
                 ],

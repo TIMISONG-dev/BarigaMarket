@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marketplace/classes/fav.dart';
 import 'package:marketplace/classes/product.dart';
 import '../components/strings.dart';
 import 'home.dart';
@@ -32,6 +33,10 @@ class Bucket extends StatefulWidget {
     cart.add(CartStrings(id, oldid, name, cost, photo));
   }
 
+  static bool isInBucket(int id) {
+    return cart.contains(id);
+  }
+
   @override
   _BucketState createState() => _BucketState();
 }
@@ -41,7 +46,21 @@ class _BucketState extends State<Bucket> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cart'),
+        title: Row(
+          children: [
+            const Text('Bucket'),
+            Padding(padding: EdgeInsets.all(10),
+            child: ElevatedButton(onPressed: (){
+              Bucket.cart.clear();
+              Navigator.pop(context);
+              },
+              child: const Text(
+                  "Сформировать заказ"
+              ),
+            ),
+            )
+          ],
+        )
       ),
       body: ListView.builder(
         itemCount: Bucket.cart.length,
@@ -109,7 +128,9 @@ class _BucketState extends State<Bucket> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                Bucket.cart[index].quantity--;
+                                if(Bucket.cart[index].quantity > 1){
+                                  Bucket.cart[index].quantity--;
+                                }
                               });
                             },
                             icon: const Icon(Icons.remove),
@@ -126,6 +147,11 @@ class _BucketState extends State<Bucket> {
                             },
                             icon: const Icon(Icons.add),
                           ),
+                          IconButton(onPressed: (){ setState(() {
+                            Bucket.cart.removeAt(index);
+                          });},
+                              icon: const Icon(Icons.delete)
+                          )
                         ],
                       ),
                     ],

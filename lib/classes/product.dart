@@ -39,7 +39,27 @@ class Product extends StatelessWidget {
             .of(context)
             .colorScheme
             .inversePrimary,
-        title: const Text("Bariga"),
+        title: Row(
+          children: [
+            const Text("Bariga"),
+            IconButton(onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Favourite()));
+            },
+                icon: const Icon(Icons.favorite_outline)
+            ),
+            IconButton(onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Bucket()));
+            },
+                icon: const Icon(Icons.shopping_cart)
+            ),
+          ],
+        ),
       ),
       body: ListView.builder(
           itemCount: 1,
@@ -84,26 +104,36 @@ class Product extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                        padding: const EdgeInsets.all(50),
-                        child:
-                          ElevatedButton(
-                            onPressed: (){ Bucket.addItem(products[ind].id, ind, products[ind].name, products[ind].cost, products[ind].photo); },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                            padding: const EdgeInsets.all(50),
+                            child:
+                            ElevatedButton(
+                              onPressed: (){ Bucket.addItem(products[ind].id, ind, products[ind].name, products[ind].cost, products[ind].photo); },
                               child: const Text(
-                                  "В корзину",
-                                  style: TextStyle(fontSize: 20),
-                      ),
-                    )),
-                    Padding(
-                        padding: const EdgeInsets.all(50),
-                        child:
-                        ElevatedButton(
-                          onPressed: (){ Favourite.addItem(products[ind].id, ind, products[ind].name, products[ind].cost, products[ind].photo); },
-                          child: const Text(
-                            "В избранные",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ))
+                                "В корзину",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            )),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                            padding: const EdgeInsets.all(50),
+                            child:
+                            ElevatedButton(
+                              onPressed: (){ Favourite.addItem(products[ind].id, ind, products[ind].name, products[ind].cost, products[ind].photo); },
+                              child: const Text(
+                                "В избранные",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            )),
+                      ],
+                    )
                   ],
                 )
               ],
